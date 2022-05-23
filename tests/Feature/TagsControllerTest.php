@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class TagsControllerTest extends TestCase
 {
+    use RefreshDatabase;
+    
     /** @test */
 
     public function itListsTags()
