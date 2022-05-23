@@ -157,11 +157,7 @@ class OfficeControllerTest extends TestCase
     public function itShowsTheOffice()
     {
         $user = User::factory()->create();
-        $tag = Tag::factory()->create();
-        $office = Office::factory()->for($user)->create();
-
-        $office->tags()->attach($tag);
-        $office->images()->create(['path' => 'image.jpg']);
+        $office = Office::factory()->for($user)->hasTags(1)->hasImages(1)->create();
 
         Reservation::factory(3)->for($office)->create();
         Reservation::factory()->for($office)->cancelled()->create();
@@ -180,34 +176,24 @@ class OfficeControllerTest extends TestCase
      */
     public function itCreatesAnOffice()
     {
-        $user = User::factory()->createQuietly();
-        $tag = Tag::factory()->create();
-        $tag2 = Tag::factory()->create();
+        $user = User::factory()->create();
+        $tags = Tag::factory(2)->create();
 
         $this->actingAs($user);
         //Sanctum::actingAs($user, ['office.create']);
 
-        $response = $this->postJson('/api/offices', [
-            'title' => 'Office in Arkansas',
-            'description' => 'Description',
-            'lat' => '39.74051727562952',
-            'lng' => '-8.770375324893696',
-            'address_line1' => 'address',
-            'price_per_day' => 10_000,
-            'monthly_discount' => 5,
-            'tags' => [
-                $tag->id, $tag2->id
-            ]
-        ]);
+        $response = $this->postJson('/api/offices', Office::factory()->raw([
+            'tags' => $tags->pluck('id')->toArray()
+        ]));
 
         $response->assertCreated()
-            ->assertJsonPath('data.title', 'Office in Arkansas')
             ->assertJsonPath('data.approval_status', Office::APPROVAL_PENDING)
+            ->assertJsonPath('data.reservations_count', 0)
             ->assertJsonPath('data.user.id', $user->id)
             ->assertJsonCount(2, 'data.tags');
 
         $this->assertDatabaseHas('offices', [
-            'title' => 'Office in Arkansas'
+            'id' => $response->json('data.id')
         ]);
     }
 
@@ -216,14 +202,15 @@ class OfficeControllerTest extends TestCase
      */
     public function itDoesntAllowCreatingIfScopeIsNotProvided()
     {
-        $user = User::factory()->createQuietly();
+        $user = User::factory()->create();
 
         //$token = $user->createToken('test', []);
-        Sanctum::actingAs($user, ['']);
+        Sanctum::actingAs($user, []);
 
         $response = $this->postJson('/api/offices');
 
-        $response->assertStatus(403);
+        //$response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     /**
@@ -231,12 +218,13 @@ class OfficeControllerTest extends TestCase
      */
     public function itAllowsCreatingIfScopeIsProvided()
     {
-        $user = User::factory()->createQuietly();
+        $user = User::factory()->create();
 
         Sanctum::actingAs($user, ['office.create']);
 
         $response = $this->postJson('/api/offices');
         
-        $this->assertNotEquals(403, $response->status());
+        //$this->assertNotEquals(403, $response->status());
+        $this->assertFalse($response->isForbidden());
     }
 }

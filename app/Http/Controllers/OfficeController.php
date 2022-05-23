@@ -72,8 +72,8 @@ class OfficeController extends Controller
 
         $office->tags()->sync($attributes['tags']);
 
-        $office->load(['images', 'tags', 'user']);
-
-        return OfficeResource::make($office);
+        return OfficeResource::make(
+            $office->load(['images', 'tags', 'user'])
+        );
     }
 }
