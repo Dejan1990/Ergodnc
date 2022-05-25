@@ -11,12 +11,13 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\OfficeResource;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Validators\OfficeValidator;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\OfficePendingApproval;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class OfficeController extends Controller
 {
@@ -127,6 +128,12 @@ class OfficeController extends Controller
             $office->reservations()->where('status', Reservation::STATUS_ACTIVE)->exists(),
             ValidationException::withMessages(['office' => 'Cannot delete this office!'])
         );
+
+        $office->images()->each(function ($image) {
+            Storage::delete($image->path);
+
+            $image->delete();
+        });
 
         $office->delete();
     }
