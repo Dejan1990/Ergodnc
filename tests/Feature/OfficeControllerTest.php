@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Storage;
 use App\Notifications\OfficePendingApproval;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 class OfficeControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     /**
      * @test
@@ -332,10 +332,11 @@ class OfficeControllerTest extends TestCase
 
         $response->assertUnprocessable();
 
-        $this->assertDatabaseHas('offices', [
+       /* $this->assertDatabaseHas('offices', [
             'id' => $office->id,
             'deleted_at' => null
-        ]);
+        ]);*/
+        $this->assertNotSoftDeleted($office);
     }
 
     /**
