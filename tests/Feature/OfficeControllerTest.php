@@ -57,7 +57,7 @@ class OfficeControllerTest extends TestCase
         Office::factory()->hidden()->for($user)->create();
         Office::factory()->pending()->for($user)->create();
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->get('/api/offices?user_id='.$user->id);
 
@@ -185,7 +185,8 @@ class OfficeControllerTest extends TestCase
         $user = User::factory()->create();
         $tags = Tag::factory(2)->create();
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
+
         $response = $this->postJson('/api/offices', Office::factory()->raw([
             'tags' => $tags->pluck('id')->toArray()
         ]));
@@ -233,7 +234,7 @@ class OfficeControllerTest extends TestCase
         $tags = Tag::factory(3)->create();
         $office = Office::factory()->for($user)->create();
         $office->tags()->attach($tags);
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
         $anotherTag = Tag::factory()->create();
         $response = $this->putJson('/api/offices/'.$office->id, [
             'title' => 'Amazing Office',
@@ -254,7 +255,7 @@ class OfficeControllerTest extends TestCase
         $user = User::factory()->create();
         $anotherUser = User::factory()->create();
         $office = Office::factory()->for($anotherUser)->create();
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/offices/'.$office->id, [
             'title' => 'Amazing Office'
         ]);
@@ -274,7 +275,7 @@ class OfficeControllerTest extends TestCase
         $user = User::factory()->create();
         $office = Office::factory()->for($user)->create();
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/offices/'.$office->id, [
             'lat' => 40.74051727562952
@@ -304,7 +305,7 @@ class OfficeControllerTest extends TestCase
             'path' => 'office_image.jpg'
         ]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson('/api/offices/'.$office->id);
 
@@ -325,7 +326,7 @@ class OfficeControllerTest extends TestCase
 
         Reservation::factory(3)->for($office)->create();
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson('/api/offices/'.$office->id);
 
@@ -349,7 +350,7 @@ class OfficeControllerTest extends TestCase
             'path' => 'image.jpg'
         ]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/offices/'.$office->id, [
             'featured_image_id' => $image->id,
@@ -372,7 +373,7 @@ class OfficeControllerTest extends TestCase
             'path' => 'image.jpg'
         ]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/offices/'.$office->id, [
             'featured_image_id' => $image->id,

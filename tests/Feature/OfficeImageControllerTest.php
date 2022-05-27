@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Office;
+use Laravel\Sanctum\Sanctum;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -24,7 +25,7 @@ class OfficeImageControllerTest extends TestCase
         $user = User::factory()->create();
         $office = Office::factory()->for($user)->create();
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->post("/api/offices/{$office->id}/images", [
             'image' => UploadedFile::fake()->image('image.jpg')
@@ -56,7 +57,7 @@ class OfficeImageControllerTest extends TestCase
             'path' => 'office_image.jpg'
         ]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson("/api/offices/{$office->id}/images/{$image->id}");
 
@@ -80,7 +81,7 @@ class OfficeImageControllerTest extends TestCase
             'path' => 'office_image.jpg'
         ]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson("/api/offices/{$office->id}/images/{$image->id}");
 
@@ -99,7 +100,7 @@ class OfficeImageControllerTest extends TestCase
             'path' => 'office_image.jpg'
         ]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson("/api/offices/{$office->id}/images/{$image->id}");
 
@@ -126,7 +127,7 @@ class OfficeImageControllerTest extends TestCase
 
         $office->update(['featured_image_id' => $image->id]);
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson("/api/offices/{$office->id}/images/{$image->id}");
 

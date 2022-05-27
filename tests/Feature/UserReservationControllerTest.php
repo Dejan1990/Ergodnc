@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Reservation;
+use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -30,7 +31,7 @@ class UserReservationControllerTest extends TestCase
         Reservation::factory()->for($user)->count(2)->create();
         Reservation::factory()->count(3)->create();
 
-        $this->actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->getJson('/api/reservations');
 
