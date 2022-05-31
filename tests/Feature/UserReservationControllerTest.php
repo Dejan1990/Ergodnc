@@ -7,7 +7,10 @@ use App\Models\User;
 use App\Models\Office;
 use App\Models\Reservation;
 use Laravel\Sanctum\Sanctum;
+use App\Notifications\NewHostReservation;
+use App\Notifications\NewUserReservation;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 class UserReservationControllerTest extends TestCase
@@ -354,5 +357,30 @@ class UserReservationControllerTest extends TestCase
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['office_id' => 'You cannot make a reservation during this time']);
+    }
+
+    /**
+     * @test
+     */
+    public function itSendsNotificationsOnNewReservations()
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $office = Office::factory()->create();
+
+        $this->actingAs($user);
+
+        $response = $this->postJson('/api/reservations', [
+            'office_id' => $office->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+        ]);
+
+        Notification::assertSentTo($user, NewUserReservation::class);
+        Notification::assertSentTo($office->user, NewHostReservation::class);
+
+        $response->assertCreated();
     }
 }
