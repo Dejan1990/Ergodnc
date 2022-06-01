@@ -33,7 +33,7 @@ class OfficeControllerTest extends TestCase
         Office::factory()->for($user)->hasAttached($tags)->create();
         Office::factory()->hasAttached($tags2)->create();
         
-        $response = $this->get('/api/offices');
+        $response = $this->get('/offices');
         $response->assertOk()
             ->assertJsonStructure(['data', 'meta', 'links'])
             ->assertJsonCount(20, 'data')
@@ -48,7 +48,7 @@ class OfficeControllerTest extends TestCase
         Office::factory(3)->create();
         Office::factory()->hidden()->create();
         Office::factory()->pending()->create();
-        $response = $this->get('/api/offices');
+        $response = $this->get('/offices');
         $response->assertOk()
             ->assertJsonCount(3, 'data');
     }
@@ -67,7 +67,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->get('/api/offices?user_id='.$user->id);
+        $response = $this->get('/offices?user_id='.$user->id);
 
         $response->assertOk()
             ->assertJsonCount(5, 'data');
@@ -82,7 +82,7 @@ class OfficeControllerTest extends TestCase
         $host = User::factory()->create();
         $office = Office::factory()->for($host)->create();
         $response = $this->get(
-            '/api/offices?user_id='.$host->id
+            '/offices?user_id='.$host->id
         );
         $response->assertOk()
             ->assertJsonCount(1, 'data')
@@ -100,7 +100,7 @@ class OfficeControllerTest extends TestCase
         Reservation::factory()->for(Office::factory())->create();
         Reservation::factory()->for($office)->for($user)->create();
         $response = $this->get(
-            '/api/offices?visitor_id='.$user->id
+            '/offices?visitor_id='.$user->id
         );
         $response->assertOk()
             ->assertJsonCount(1, 'data')
@@ -119,7 +119,7 @@ class OfficeControllerTest extends TestCase
         Office::factory()->create();
 
         $response = $this->get(
-            '/api/offices?'.http_build_query([
+            '/offices?'.http_build_query([
                 'tags' => $tags->pluck('id')->toArray()
             ])
         );
@@ -137,7 +137,7 @@ class OfficeControllerTest extends TestCase
         $user = User::factory()->create();
         Office::factory()->for($user)->hasTags(1)->hasImages(1)->create();
 
-        $response = $this->get('/api/offices');
+        $response = $this->get('/offices');
         $response->assertOk()
             ->assertJsonCount(1, 'data.0.tags')
             ->assertJsonCount(1, 'data.0.images')
@@ -153,7 +153,7 @@ class OfficeControllerTest extends TestCase
         Reservation::factory()->for($office)->create();
         Reservation::factory()->for($office)->cancelled()->create();
 
-        $response = $this->get('/api/offices');
+        $response = $this->get('/offices');
 
         $response->assertOk()
             ->assertJsonPath('data.0.reservations_count', 1);
@@ -195,7 +195,7 @@ class OfficeControllerTest extends TestCase
         $office = Office::factory()->for($user)->hasTags(1)->hasImages(1)->create();
         Reservation::factory()->for($office)->create();
         Reservation::factory()->for($office)->cancelled()->create();
-        $response = $this->get('/api/offices/'.$office->id);
+        $response = $this->get('/offices/'.$office->id);
         $response->assertOk()
             ->assertJsonPath('data.reservations_count', 1)
             ->assertJsonCount(1, 'data.tags')
@@ -217,7 +217,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->postJson('/api/offices', Office::factory()->raw([
+        $response = $this->postJson('/offices', Office::factory()->raw([
             'tags' => $tags->pluck('id')->toArray()
         ]));
         $response->assertCreated()
@@ -239,7 +239,7 @@ class OfficeControllerTest extends TestCase
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user, []);
-        $response = $this->postJson('/api/offices');
+        $response = $this->postJson('/offices');
         //$response->assertStatus(403);
         $response->assertForbidden();
     }
@@ -251,7 +251,7 @@ class OfficeControllerTest extends TestCase
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user, ['office.create']);
-        $response = $this->postJson('/api/offices');
+        $response = $this->postJson('/offices');
         $this->assertNotEquals(Response::HTTP_FORBIDDEN, $response->status());
     }
 
@@ -266,7 +266,7 @@ class OfficeControllerTest extends TestCase
         $office->tags()->attach($tags);
         Sanctum::actingAs($user, ['*']);
         $anotherTag = Tag::factory()->create();
-        $response = $this->putJson('/api/offices/'.$office->id, [
+        $response = $this->putJson('/offices/'.$office->id, [
             'title' => 'Amazing Office',
             'tags' => [$tags[0]->id, $anotherTag->id]
         ]);
@@ -286,7 +286,7 @@ class OfficeControllerTest extends TestCase
         $anotherUser = User::factory()->create();
         $office = Office::factory()->for($anotherUser)->create();
         Sanctum::actingAs($user, ['*']);
-        $response = $this->putJson('/api/offices/'.$office->id, [
+        $response = $this->putJson('/offices/'.$office->id, [
             'title' => 'Amazing Office'
         ]);
 
@@ -307,7 +307,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->putJson('/api/offices/'.$office->id, [
+        $response = $this->putJson('/offices/'.$office->id, [
             'lat' => 40.74051727562952
         ]);
 
@@ -337,7 +337,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->deleteJson('/api/offices/'.$office->id);
+        $response = $this->deleteJson('/offices/'.$office->id);
 
         $response->assertOk();
 
@@ -358,7 +358,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->deleteJson('/api/offices/'.$office->id);
+        $response = $this->deleteJson('/offices/'.$office->id);
 
         $response->assertUnprocessable();
 
@@ -383,7 +383,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->putJson('/api/offices/'.$office->id, [
+        $response = $this->putJson('/offices/'.$office->id, [
             'featured_image_id' => $image->id,
         ]);
 
@@ -406,7 +406,7 @@ class OfficeControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->putJson('/api/offices/'.$office->id, [
+        $response = $this->putJson('/offices/'.$office->id, [
             'featured_image_id' => $image->id,
         ]);
 

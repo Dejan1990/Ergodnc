@@ -36,7 +36,7 @@ class UserReservationControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->getJson('/api/reservations');
+        $response = $this->getJson('/reservations');
 
         $response
             ->assertJsonStructure(['data', 'meta', 'links'])
@@ -98,7 +98,7 @@ class UserReservationControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->getJson('/api/reservations?'.http_build_query([
+        $response = $this->getJson('/reservations?'.http_build_query([
             'from_date' => $fromDate,
             'to_date' => $toDate,
         ]));
@@ -123,7 +123,7 @@ class UserReservationControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->getJson('/api/reservations?'.http_build_query([
+        $response = $this->getJson('/reservations?'.http_build_query([
             'status' => Reservation::STATUS_ACTIVE,
         ]));
 
@@ -146,7 +146,7 @@ class UserReservationControllerTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->getJson('/api/reservations?'.http_build_query([
+        $response = $this->getJson('/reservations?'.http_build_query([
             'office_id' => $office->id,
         ]));
 
@@ -171,7 +171,7 @@ class UserReservationControllerTest extends TestCase
         //Sanctum::actingAs($user, ['reservations.make']);
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             //'start_date' => now()->addDays(1),
             'start_date' => now()->addDay(),
@@ -196,7 +196,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => 10000,
             //'start_date' => now()->addDays(1),
             'start_date' => now()->addDay(),
@@ -218,7 +218,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             //'start_date' => now()->addDays(1),
             'start_date' => now()->addDay(),
@@ -240,7 +240,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             //'start_date' => now()->addDays(1),
             'start_date' => now()->addDay(),
@@ -269,13 +269,13 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             'start_date' => now()->addDay(),
             'end_date' => now()->addDays(41),
         ]);
 
-        $response2 = $this->postJson('/api/reservations', [
+        $response2 = $this->postJson('/reservations', [
             'office_id' => $office2->id,
             'start_date' => now()->addDay(),
             'end_date' => now()->addDays(41),
@@ -299,7 +299,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             //'start_date' => now()->addDays(1),
             'start_date' => now()->addDay(),
@@ -320,7 +320,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             'start_date' => now()->toDateString(),
             'end_date' => now()->addDays(3)->toDateString(),
@@ -349,7 +349,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             'start_date' => $fromDate,
             'end_date' => $toDate,
@@ -372,7 +372,7 @@ class UserReservationControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/reservations', [
             'office_id' => $office->id,
             'start_date' => now()->addDay(),
             'end_date' => now()->addDays(2),
